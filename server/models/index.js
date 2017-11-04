@@ -21,54 +21,57 @@ module.exports = {
       // var toInsert = 'INSERT INTO messages (message, username_id, room_id) VALUES ("Some Text", 1, 42)';
       
       // check room existence
-      
       var roomID = undefined;
       var userID = undefined;
+      
+      var nowWriteTheMessage = function() {
+        var messsageToInsert = `INSERT INTO messages (message, username_id, room_id) VALUES ("${bodyObj.text}", "${userID}", "${roomID}")`;
+        console.log('MTI', messsageToInsert);
+        db.query(messsageToInsert, function(err, result) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('The message has been added to the db');
+          }
+        });
+      };
+      
+      var nowGetUserID = function() {
+        module.exports.users.get(bodyObj.username, function(queryUserID) {
+          if (queryUserID !== undefined) {
+            userID = queryUserID;
+            nowWriteTheMessage();
+          } else {
+            db.query('SELECT COUNT(*) FROM users', function(err, result) {
+              if (err) {
+                console.log(err);
+              } else {
+                userID = result[0]['COUNT(*)'] + 1;
+                module.exports.users.post(bodyObj.username, nowWriteTheMessage);
+                // callback that does the message post
+              }
+            });
+          }
+        });
+      };
       
       module.exports.rooms.get(bodyObj.roomname, function(queryRoomID) {
         if (queryRoomID !== undefined) {
           roomID = queryRoomID;
+          // now call the users get
+          nowGetUserID();
         } else {
           db.query('SELECT COUNT(*) FROM rooms', function(err, result) {
             if (err) {
               console.log(err);
             } else {
               roomID = result[0]['COUNT(*)'] + 1;
-              module.exports.rooms.post(bodyObj.roomname);
+              module.exports.rooms.post(bodyObj.roomname, nowGetUserID);
+              // pass in a callback that does the users get
             }
           });
         }
       });
-      
-      module.exports.users.get(bodyObj.username, function(queryUserID) {
-        if (queryUserID !== undefined) {
-          userID = queryUserID;
-        } else {
-          db.query('SELECT COUNT(*) FROM users', function(err, result) {
-            if (err) {
-              console.log(err);
-            } else {
-              userID = result[0]['COUNT(*)'] + 1;
-              module.exports.users.post(bodyObj.username);
-            }
-          });
-        }
-      });
-      
-      var messsageToInsert = `INSERT INTO messages (message, username_id, room_id) VALUES ("${bodyObj.message}", "${userID}", "${roomID}")`;
-      console.log('MTI', messsageToInsert);
-      
-      
-      
-      // var roomToInsert = 'INSERT INTO rooms (name) VALUES ("' + bodyObj.roomname + '")';
-      // console.log('roomToInsert', roomToInsert);
-      // db.query(roomToInsert, function(err, result) {
-      //   if (err) {
-      //     console.log (err);
-      //   } else {
-      //     console.log('Data inserted into rooms table');
-      //   }
-      // });
       
       callback();
     } // a function which can be used to insert a message into the database
@@ -91,7 +94,7 @@ module.exports = {
         }
       });
     },
-    post: function(username) {
+    post: function(username, callback) {
       var userToInsert = 'INSERT INTO users (name) VALUES ("' + username + '")';
       console.log('userToInsert', userToInsert);
       db.query(userToInsert, function(err, result) {
@@ -99,6 +102,7 @@ module.exports = {
           console.log (err);
         } else {
           console.log('Data inserted into users table');
+          callback();
         }
       });
     }

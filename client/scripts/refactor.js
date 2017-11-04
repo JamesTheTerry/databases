@@ -22,7 +22,7 @@
 
 app = {
 
-  server: 'http://127.0.0.1:3000/chatterbox/classes/messages',
+  server: 'http://parse.CAMPUS.hackreactor.com/chatterbox/classes/messages',
 
   init: function() {
     // Get username
@@ -76,8 +76,7 @@ app = {
   loadMsgs: function() {
     $.ajax({
       url: app.server,
-      // data: { order: '-createdAt' },
-      data: {},
+      data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(json) {
         app.displayMessages(json.results);
@@ -135,8 +134,7 @@ var Messages = Backbone.Collection.extend({
   url: 'https://api.parse.com/1/classes/messages/',
 
   loadMsgs: function() {
-    // this.fetch({data: { order: '-createdAt' }});
-    this.fetch({data: {}});
+    this.fetch({data: { order: '-createdAt' }});
   },
 
   parse: function(response, options) {

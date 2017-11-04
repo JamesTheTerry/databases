@@ -1,8 +1,9 @@
+
 var app = {
 
   //TODO: The current 'handleUsernameClick' function just toggles the class 'friend'
   //to all messages sent by the user
-  server: 'http://127.0.0.1:3000/chatterbox/classes/messages',
+  server: 'http://127.0.0.1:3000/classes/messages',
   username: 'anonymous',
   roomname: 'lobby',
   lastMessageId: 0,
@@ -25,30 +26,28 @@ var app = {
     app.$roomSelect.on('change', app.handleRoomChange);
 
     // Fetch previous messages
-    // app.startSpinner();
+    app.startSpinner();
     app.fetch(false);
 
     // Poll for new messages
-    setInterval(function() {
-      app.fetch(true);
-    }, 3000);
+    // setInterval(function() {
+    //   app.fetch(true);
+    // }, 3000);
   },
 
   send: function(message) {
     app.startSpinner();
-
+    app.stopSpinner();
     // POST the message to the server
     $.ajax({
       url: app.server,
       type: 'POST',
-      data: JSON.stringify(message),
+      data: message,
       success: function (data) {
-        console.log('Successful Post');
         // Clear messages input
         app.$message.val('');
         // Trigger a fetch to update the messages, pass true to animate
         app.fetch();
-        app.stopSpinner();
       },
       error: function (error) {
         console.error('chatterbox: Failed to send message', error);
@@ -57,7 +56,6 @@ var app = {
   },
 
   fetch: function(animate) {
-    console.log('Sending GET request');
     $.ajax({
       url: app.server,
       type: 'GET',
@@ -65,8 +63,10 @@ var app = {
       data: {},
       contentType: 'application/json',
       success: function(data) {
-        console.log('Received [' + typeof data + '] data: ' + data);
+
         // Don't bother if we have nothing to work with
+        data = JSON.parse(data);
+        
         if (!data.results || !data.results.length) { return; }
 
         // Store messages for caching later
@@ -89,7 +89,6 @@ var app = {
       },
       error: function(error) {
         console.error('chatterbox: Failed to fetch messages', error);
-        app.fetch();
       }
     });
   },
@@ -230,10 +229,11 @@ var app = {
 
   startSpinner: function() {
     $('.spinner img').show();
-    $('form input[type=submit]').attr('disabled', 'true');
+    // $('form input[type=submit]').attr('disabled', 'true');
   },
 
   stopSpinner: function() {
+    console.log('stopping spinner');
     $('.spinner img').fadeOut('fast');
     $('form input[type=submit]').attr('disabled', null);
   }

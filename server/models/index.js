@@ -1,11 +1,11 @@
 var db = require('../db').databaseConnect;
 
-// SELECT messages.id, messages.message, users.name, rooms.name FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id;
+// SELECT messages.id, messages.message, users.username, rooms.roomname FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id;
 
 module.exports = {
   messages: {
     get: function (callback) {
-      var getQuery = 'SELECT messages.id, messages.message, users.name, rooms.name FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id';
+      var getQuery = 'SELECT messages.id, messages.message, users.username, rooms.roomname FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id';
       db.query(getQuery, function(err, result) {
         console.log(result);
       });
@@ -15,17 +15,6 @@ module.exports = {
       
     }, // a function which produces all the messages
     post: function (bodyObj, callback) {
-      // we've got a user, room, and message
-      // pre req for adding message to db
-        // roomID
-        // userID
-        // if either don't exist, create then return their id
-      
-      // add to message table, id (autogen), message, roomID, userID
-
-      // var toInsert = 'INSERT INTO messages (message, username_id, room_id) VALUES ("Some Text", 1, 42)';
-      
-      // check room existence
       var roomID = undefined;
       var userID = undefined;
       
@@ -84,7 +73,7 @@ module.exports = {
 
   users: {
     get: function(username, callback) {
-      var userExistQuery = `SELECT id FROM users WHERE name = "${username}"`;
+      var userExistQuery = `SELECT id FROM users WHERE username = "${username}"`;
       db.query(userExistQuery, function(err, result) {
         if (err) {
           console.log(err);
@@ -100,7 +89,7 @@ module.exports = {
       });
     },
     post: function(username, callback) {
-      var userToInsert = 'INSERT INTO users (name) VALUES ("' + username + '")';
+      var userToInsert = 'INSERT INTO users (username) VALUES ("' + username + '")';
       console.log('userToInsert', userToInsert);
       db.query(userToInsert, function(err, result) {
         if (err) {
@@ -115,7 +104,7 @@ module.exports = {
   
   rooms: {
     get: function(roomname, callback) {
-      var roomExistQuery = `SELECT id FROM rooms WHERE name = "${roomname}"`;
+      var roomExistQuery = `SELECT id FROM rooms WHERE roomname = "${roomname}"`;
       db.query(roomExistQuery, function(err, result) {
         if (err) {
           console.log(err);
@@ -131,7 +120,7 @@ module.exports = {
       });
     },
     post: function(roomname, callback) {
-      var roomToInsert = 'INSERT INTO rooms (name) VALUES ("' + roomname + '")';
+      var roomToInsert = 'INSERT INTO rooms (roomname) VALUES ("' + roomname + '")';
       console.log('roomToInsert', roomToInsert);
       db.query(roomToInsert, function(err, result) {
         if (err) {

@@ -5,13 +5,13 @@ USE chat;
 CREATE TABLE rooms (
   /* Describe your table here.*/
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-  name CHAR(25)
+  roomname CHAR(25)
 );
 
 CREATE TABLE users (
   /* Describe your table here.*/
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-  name CHAR(25)
+  username CHAR(25)
 );
 
 CREATE TABLE messages (

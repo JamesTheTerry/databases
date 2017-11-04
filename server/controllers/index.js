@@ -69,7 +69,13 @@ module.exports = {
     },
     get: function (req, res) {},
     post: function (req, res) {
-      console.log('post user');
+      // console.log('post user');
+      res.writeHead(201, defaultCorsHeaders);
+      // console.log(req.body);
+      models.users.post(req.body.username, function() {
+        res.end('{"Eat": "it node js"}');
+      });
+      
     }
   }
 };

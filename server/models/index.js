@@ -23,6 +23,7 @@ module.exports = {
             console.log(err);
           } else {
             console.log('The message has been added to the db');
+            callback();
           }
         });
       };
@@ -64,12 +65,12 @@ module.exports = {
         }
       });
       
-      callback();
     } // a function which can be used to insert a message into the database
   },
 
   users: {
     get: function(username, callback) {
+      console.log('In user model');
       var userExistQuery = `SELECT id FROM users WHERE username = "${username}"`;
       db.query(userExistQuery, function(err, result) {
         if (err) {

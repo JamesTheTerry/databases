@@ -55,8 +55,8 @@ module.exports = {
         }
       });
       
-      
-      
+      var messsageToInsert = `INSERT INTO messages (message, username_id, room_id) VALUES ("${bodyObj.message}", "${userID}", "${roomID}")`;
+      console.log('MTI', messsageToInsert);
       
       
       
@@ -121,7 +121,7 @@ module.exports = {
         }
       });
     },
-    post: function(roomname) {
+    post: function(roomname, callback) {
       var roomToInsert = 'INSERT INTO rooms (name) VALUES ("' + roomname + '")';
       console.log('roomToInsert', roomToInsert);
       db.query(roomToInsert, function(err, result) {
@@ -129,6 +129,7 @@ module.exports = {
           console.log (err);
         } else {
           console.log('Data inserted into rooms table');
+          callback();
         }
       });
     }

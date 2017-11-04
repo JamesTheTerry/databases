@@ -1,4 +1,4 @@
-var db = require('../db');
+var db = require('../db').databaseConnect;
 
 module.exports = {
   messages: {
@@ -17,17 +17,43 @@ module.exports = {
         // if either don't exist, create then return their id
       
       // add to message table, id (autogen), message, roomID, userID
-      console.log('did we get here?');
-      var toInsert = 'INSERT INTO messages (message, username_id, room_id) VALUES ("Some Text", 1, 42)';
-      var roomToInsert = 'INSERT INTO rooms (name) VALUES ("' + bodyObj.roomname + '")';
-      console.log('roomToInsert', roomToInsert);
-      db.databaseConnect.query(roomToInsert, function(err, result) {
-        if (err) {
-          console.log (err);
+
+      // var toInsert = 'INSERT INTO messages (message, username_id, room_id) VALUES ("Some Text", 1, 42)';
+      
+      // check room existence
+      
+      var roomID = undefined;
+      var userID = undefined;
+      
+      module.exports.rooms.get(bodyObj.roomname, function(queryRoomID) {
+        if (queryRoomID !== undefined) {
+          roomID = queryRoomID;
         } else {
-          console.log('It best be there');
+          db.query('SELECT COUNT(*) FROM rooms', function(err, result) {
+            if (err) {
+              console.log(err);
+            } else {
+              roomID = result[0]['COUNT(*)'] + 1;
+              module.exports.rooms.post(bodyObj.roomname);
+            }
+          });
         }
       });
+      
+      
+      
+      
+      
+      
+      // var roomToInsert = 'INSERT INTO rooms (name) VALUES ("' + bodyObj.roomname + '")';
+      // console.log('roomToInsert', roomToInsert);
+      // db.query(roomToInsert, function(err, result) {
+      //   if (err) {
+      //     console.log (err);
+      //   } else {
+      //     console.log('Data inserted into rooms table');
+      //   }
+      // });
       
       callback();
     } // a function which can be used to insert a message into the database
@@ -37,6 +63,38 @@ module.exports = {
     // Ditto as above.
     get: function () {},
     post: function () {}
+  },
+  
+  rooms: {
+    get: function(roomname, callback) {
+      var roomExistQuery = `SELECT id FROM rooms WHERE name = "${roomname}"`;
+      db.query(roomExistQuery, function(err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          if (result.length) {
+            console.log('Room Exists, id: ', result[0].id);
+            callback(result[0].id);
+          } else {
+            console.log('New Room');
+            callback(undefined);
+            // now we need to add the room
+            
+          }
+        }
+      });
+    },
+    post: function(roomname) {
+      var roomToInsert = 'INSERT INTO rooms (name) VALUES ("' + roomname + '")';
+      console.log('roomToInsert', roomToInsert);
+      db.query(roomToInsert, function(err, result) {
+        if (err) {
+          console.log (err);
+        } else {
+          console.log('Data inserted into rooms table');
+        }
+      });
+    }
   }
 };
 

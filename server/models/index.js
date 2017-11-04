@@ -1,11 +1,16 @@
 var db = require('../db').databaseConnect;
 
+// SELECT messages.id, messages.message, users.name, rooms.name FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id;
+
 module.exports = {
   messages: {
     get: function (callback) {
-      // get the messages from the db
-      console.log('Model.get');
-      var data = 'pie'; // but data is all the messages
+      var getQuery = 'SELECT messages.id, messages.message, users.name, rooms.name FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id';
+      db.query(getQuery, function(err, result) {
+        console.log(result);
+      });
+      
+      var data = 'pie';
       callback(data);
       
     }, // a function which produces all the messages

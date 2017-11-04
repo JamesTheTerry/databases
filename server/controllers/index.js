@@ -48,11 +48,25 @@ module.exports = {
         // data is whatever we've read from the db, so all the messages
         // we might need to stringify the data
         console.log(data);
+
       });
+      
+      //res end should actually be in the callback ^
       res.end(JSON.stringify(fakeData));
     }, // a function which handles a get request for all messages
     post: function (req, res) {
-      console.log('post message');
+      console.log('Posting Message (Controller)');
+      res.writeHead(201, defaultCorsHeaders);
+      var body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', () => {
+        var bodyObj = JSON.parse(body);
+        models.messages.post(bodyObj, function() {
+          res.end('{"Eat": "it node js"}');
+        });
+      });
     } // a function which handles posting a message to the database
   },
 

@@ -8,18 +8,15 @@ module.exports = {
       var getQuery = 'SELECT messages.id, messages.message, users.username, rooms.roomname FROM messages, users, rooms WHERE messages.username_id = users.id AND messages.room_id = rooms.id';
       db.query(getQuery, function(err, result) {
         console.log(result);
+        callback(result);
       });
-      
-      var data = 'pie';
-      callback(data);
-      
     }, // a function which produces all the messages
     post: function (bodyObj, callback) {
       var roomID = undefined;
       var userID = undefined;
       
       var nowWriteTheMessage = function() {
-        var messsageToInsert = `INSERT INTO messages (message, username_id, room_id) VALUES ("${bodyObj.text}", "${userID}", "${roomID}")`;
+        var messsageToInsert = `INSERT INTO messages (message, username_id, room_id) VALUES ("${bodyObj.message}", "${userID}", "${roomID}")`;
         console.log('MTI', messsageToInsert);
         db.query(messsageToInsert, function(err, result) {
           if (err) {

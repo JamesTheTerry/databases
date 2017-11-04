@@ -12,24 +12,9 @@ var fakeData = {
   'results': [
     {
       'username': 'James',
-      'text': 'First!',
-      'createdAt': '2017-10-21T00:46:46:168Z',
+      'message': 'First!',
       'roomname': 'lobby',
-      'objectId': 1
-    },
-    {
-      'username': 'Enkhtushig',
-      'text': 'Second...',
-      'createdAt': '2017-10-21T00:46:46:330Z',
-      'roomname': 'lobby',
-      'objectId': 2
-    },
-    {
-      'username': 'Earl John',
-      'text': 'Whats up',
-      'createdAt': '2017-10-21T00:46:46:330Z',
-      'roomname': 'lobby',
-      'objectId': 3
+      'id': 1
     }]
 };
 
@@ -47,12 +32,17 @@ module.exports = {
       models.messages.get(function(data) {
         // data is whatever we've read from the db, so all the messages
         // we might need to stringify the data
-        console.log(data);
-
+        console.log('Fake Data: ', JSON.stringify(fakeData));
+        
+        
+        var dataToGo = `{"results":${JSON.stringify(data)}}`;
+        console.log('Real Data: ', dataToGo);
+        
+        res.end(dataToGo);
       });
       
-      //res end should actually be in the callback ^
-      res.end(JSON.stringify(fakeData));
+      // res end should actually be in the callback ^
+      // res.end(JSON.stringify(fakeData));
     }, // a function which handles a get request for all messages
     post: function (req, res) {
       console.log('Posting Message (Controller)');

@@ -40,6 +40,21 @@ module.exports = {
         }
       });
       
+      module.exports.users.get(bodyObj.username, function(queryUserID) {
+        if (queryUserID !== undefined) {
+          userID = queryUserID;
+        } else {
+          db.query('SELECT COUNT(*) FROM users', function(err, result) {
+            if (err) {
+              console.log(err);
+            } else {
+              userID = result[0]['COUNT(*)'] + 1;
+              module.exports.users.post(bodyObj.username);
+            }
+          });
+        }
+      });
+      
       
       
       
@@ -60,9 +75,33 @@ module.exports = {
   },
 
   users: {
-    // Ditto as above.
-    get: function () {},
-    post: function () {}
+    get: function(username, callback) {
+      var userExistQuery = `SELECT id FROM users WHERE name = "${username}"`;
+      db.query(userExistQuery, function(err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          if (result.length) {
+            console.log('User Exists, id: ', result[0].id);
+            callback(result[0].id);
+          } else {
+            console.log('New User');
+            callback(undefined);            
+          }
+        }
+      });
+    },
+    post: function(username) {
+      var userToInsert = 'INSERT INTO users (name) VALUES ("' + username + '")';
+      console.log('userToInsert', userToInsert);
+      db.query(userToInsert, function(err, result) {
+        if (err) {
+          console.log (err);
+        } else {
+          console.log('Data inserted into users table');
+        }
+      });
+    }
   },
   
   rooms: {
@@ -78,8 +117,6 @@ module.exports = {
           } else {
             console.log('New Room');
             callback(undefined);
-            // now we need to add the room
-            
           }
         }
       });
